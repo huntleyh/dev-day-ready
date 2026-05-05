@@ -29,4 +29,4 @@ def test_build_flow_version_missing_file(tmp_path: Path) -> None:
 
 
 def test_build_flow_artifact_filename() -> None:
-    assert build_flow_artifact_filename("flow-1234567890") == "minimal-local-foundry-flow-flow-1234567890.yaml"
+    assert build_flow_artifact_filename("flow-1234567890") == "minimal-local-foundry-flow-flow-1234567890.txt"

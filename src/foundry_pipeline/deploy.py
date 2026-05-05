@@ -32,7 +32,7 @@ def build_flow_version(flow_path: Path = DEFAULT_FLOW_PATH) -> str:
 
 
 def build_flow_artifact_filename(flow_version: str) -> str:
-    return f"{FLOW_ARTIFACT_PREFIX}-{flow_version}.yaml"
+    return f"{FLOW_ARTIFACT_PREFIX}-{flow_version}.txt"
 
 
 def _build_toolset() -> ToolSet:
