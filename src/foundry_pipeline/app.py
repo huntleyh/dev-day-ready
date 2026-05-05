@@ -8,10 +8,9 @@ from typing import Any
 
 from azure.ai.agents import AgentsClient
 from azure.ai.agents.models import (
-    AgentThreadCreationOptions,
     FunctionTool,
     MessageRole,
-    ThreadMessageOptions,
+    RunStatus,
     ToolSet,
 )
 from azure.identity import DefaultAzureCredential
@@ -106,32 +105,35 @@ def run_pipeline(
             ),
             toolset=toolset,
         )
+        thread_id: str | None = None
         try:
             client.enable_auto_function_calls(toolset)
-            thread_options = AgentThreadCreationOptions(
-                messages=[
-                    ThreadMessageOptions(
-                        role=MessageRole.USER,
-                        content=orchestrated_prompt,
-                    )
-                ]
+            thread = client.threads.create()
+            thread_id = thread.id
+
+            client.messages.create(
+                thread_id=thread_id,
+                role=MessageRole.USER,
+                content=orchestrated_prompt,
             )
-            run = client.create_thread_and_process_run(
+
+            run = client.runs.create_and_process(
+                thread_id=thread_id,
                 agent_id=agent.id,
-                thread=thread_options,
                 toolset=toolset,
                 polling_interval=1,
             )
 
-            if str(run.status).lower() != "completed":
+            status_value = str(getattr(run.status, "value", run.status)).lower()
+            if status_value != str(RunStatus.COMPLETED.value):
                 return {
                     "mode": "online",
-                    "run_status": str(run.status),
+                    "run_status": status_value,
                     "response": "Run did not complete successfully.",
                 }
 
             text_content = client.messages.get_last_message_text_by_role(
-                run.thread_id,
+                thread_id,
                 MessageRole.AGENT,
             )
             response_text = ""
@@ -140,10 +142,16 @@ def run_pipeline(
 
             return {
                 "mode": "online",
-                "run_status": str(run.status),
+                "run_status": status_value,
                 "response": response_text,
             }
         finally:
+            if thread_id:
+                try:
+                    client.threads.delete(thread_id)
+                except Exception:
+                    # Best-effort cleanup; agent cleanup still runs.
+                    pass
             client.delete_agent(agent.id)
 
 

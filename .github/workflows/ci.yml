@@ -3,10 +3,13 @@ name: ci
 on:
   push:
     paths:
+    - main.py
     - src/**
     - tests/**
+    - flows/**
     - promptflow/**
     - requirements*.txt
+    - .env
     - .github/workflows/ci.yml
   pull_request:
 
@@ -32,3 +35,6 @@ jobs:
 
     - name: Run tests
       run: pytest -q
+
+    - name: Offline script execution check
+      run: python main.py --offline --prompt "Should release 1.0 proceed?"

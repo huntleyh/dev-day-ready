@@ -1,0 +1,20 @@
+name: minimal_local_foundry_flow
+description: Minimal orchestration sample with model step + tool step.
+inputs:
+  question:
+    type: string
+    default: Should this release proceed?
+steps:
+- id: model_step
+  type: model
+  description: Send a concise prompt to the Foundry managed agent runtime.
+  input: ${inputs.question}
+- id: tool_step
+  type: tool
+  tool: release_gate_tool
+  description: Apply a simple release gate decision.
+  input:
+    change_scope: small
+outputs:
+  orchestrated_question: ${steps.model_step.input}
+  gate_decision: ${steps.tool_step.output}

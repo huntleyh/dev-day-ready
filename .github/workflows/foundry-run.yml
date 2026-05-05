@@ -41,4 +41,4 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     - name: Run Foundry pipeline
-      run: python -m foundry_pipeline.app --prompt "${{ inputs.prompt }}"
+      run: python main.py --prompt "${{ inputs.prompt }}"
