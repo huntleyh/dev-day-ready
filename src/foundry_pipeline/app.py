@@ -13,8 +13,8 @@ from azure.ai.agents.models import (
     RunStatus,
     ToolSet,
 )
-from azure.identity import DefaultAzureCredential
 
+from .auth import get_credential
 from .orchestration import PipelineContext, build_orchestrated_prompt
 
 try:
@@ -88,10 +88,7 @@ def run_pipeline(
         }
 
     settings = load_settings()
-    credential = DefaultAzureCredential(
-        exclude_shared_token_cache_credential=True,
-        exclude_visual_studio_code_credential=True,
-    )
+    credential = get_credential()
 
     toolset = _create_toolset()
 
