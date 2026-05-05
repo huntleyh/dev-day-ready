@@ -1,0 +1,21 @@
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
+id: minimal_foundry_pipeline_orchestration
+name: minimal_foundry_pipeline_orchestration
+display_name: Minimal Foundry Pipeline Orchestration
+type: standard
+inputs:
+  question:
+    type: string
+    default: Should this release proceed?
+outputs:
+  orchestrated_prompt:
+    type: string
+    reference: ${nodes.compose_prompt.output}
+nodes:
+- name: compose_prompt
+  type: python
+  source:
+    type: code
+    path: tools/compose_prompt.py
+  inputs:
+    question: ${inputs.question}
