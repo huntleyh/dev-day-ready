@@ -1,6 +1,10 @@
 from pathlib import Path
 
-from foundry_pipeline.deploy import build_agent_version, build_flow_version
+from foundry_pipeline.deploy import (
+    build_agent_version,
+    build_flow_artifact_filename,
+    build_flow_version,
+)
 
 
 def test_build_agent_version_local_defaults(monkeypatch) -> None:
@@ -22,3 +26,7 @@ def test_build_flow_version_from_file(tmp_path: Path) -> None:
 def test_build_flow_version_missing_file(tmp_path: Path) -> None:
     missing = tmp_path / "missing.yaml"
     assert build_flow_version(missing) == "missing-flow"
+
+
+def test_build_flow_artifact_filename() -> None:
+    assert build_flow_artifact_filename("flow-1234567890") == "minimal-local-foundry-flow-flow-1234567890.yaml"

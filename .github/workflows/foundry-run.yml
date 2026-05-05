@@ -92,13 +92,16 @@ jobs:
 
         data = json.loads(Path("deploy-output.json").read_text(encoding="utf-8"))
         created = data["created"]
+        published_flow = data.get("published_flow", {})
         versions = data.get("all_versions", [])
+        flow_files = data.get("recent_flow_files", [])
 
         lines = [
             "## Foundry Deployment",
             f"- Created agent: {created['name']} ({created['id']})",
             f"- Agent version: {created['agent_version']}",
             f"- Flow version: {created['flow_version']}",
+            f"- Published flow file: {published_flow.get('filename', '')} ({published_flow.get('id', '')})",
             "",
             "### Recent Versions",
         ]
@@ -110,6 +113,13 @@ jobs:
                 )
         else:
             lines.append("- No previously deployed versions found.")
+
+        lines.extend(["", "### Recent Flow Files"])
+        if flow_files:
+          for item in flow_files[:10]:
+            lines.append(f"- {item['filename']} ({item['id']})")
+        else:
+          lines.append("- No flow files found.")
 
         summary_file = Path(__import__("os").environ["GITHUB_STEP_SUMMARY"])
         summary_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
